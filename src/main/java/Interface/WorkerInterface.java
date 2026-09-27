@@ -45,9 +45,9 @@ public interface WorkerInterface extends Remote {
     * Receives an ELECTION message together with
     * the worker's ID and JAC.
     *
-    * @param electionId unique ID of the election
-    * @param candidateId ID of the worker
-    * @param candidateJac JAC value of the worker
+    *  electionId unique ID of the election
+    *  candidateId ID of the worker
+    *  candidateJac JAC value of the worker
     */
     void receiveElectionData(String electionId,int candidateId,int candidateJac)    
         throws RemoteException;

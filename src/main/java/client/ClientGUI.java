@@ -6,6 +6,11 @@ package client;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -16,6 +21,7 @@ public class ClientGUI extends JFrame {
     private JComboBox<String> jobType;
     private JTextField inputField;
     private JButton submitButton;
+    private JButton loadCsvButton;
     private JTextArea resultArea;
 
     public ClientGUI() {
@@ -31,96 +37,151 @@ public class ClientGUI extends JFrame {
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15)
         );
 
-        // =========================
+        
         // Job selection
-        // =========================
         JPanel topPanel = new JPanel(new FlowLayout());
 
         JLabel jobLabel = new JLabel("Select Job:");
 
         jobType = new JComboBox<>(new String[]{
-                    "MAX",
-                    "PRIMESUM",
-                    "PRIMECOUNT"
-                });
+            "MAX",
+            "PRIMESUM",
+            "PRIMECOUNT"
+        });
 
         topPanel.add(jobLabel);
         topPanel.add(jobType);
 
-        // =========================
+        
         // Input section
-        // =========================
         JPanel inputPanel = new JPanel(new BorderLayout(5, 5));
 
         JLabel inputLabel = new JLabel("Input:");
 
         inputField = new JTextField();
 
-        inputPanel.add(inputLabel,BorderLayout.WEST);
+        inputPanel.add(inputLabel, BorderLayout.WEST);
+        inputPanel.add(inputField, BorderLayout.CENTER);
 
-        inputPanel.add(inputField,BorderLayout.CENTER);
+        
+        // Buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout());
 
-        // =========================
-        // Submit button
-        // =========================
+        loadCsvButton = new JButton("Load CSV");
         submitButton = new JButton("Submit Job");
 
-        // =========================
+        buttonPanel.add(loadCsvButton);
+        buttonPanel.add(submitButton);
+
         // Result area
-        // =========================
         resultArea = new JTextArea();
 
         resultArea.setEditable(false);
 
         JScrollPane scrollPane = new JScrollPane(resultArea);
 
-        // =========================
         // Add components
-        // =========================
-        mainPanel.add(
-                topPanel,
-                BorderLayout.NORTH
-        );
+        mainPanel.add(topPanel,BorderLayout.NORTH);
 
-        mainPanel.add(
-                inputPanel,
-                BorderLayout.CENTER
-        );
+        mainPanel.add(inputPanel,BorderLayout.CENTER);
 
-        mainPanel.add(
-                submitButton,
-                BorderLayout.SOUTH
-        );
+        mainPanel.add(buttonPanel,BorderLayout.SOUTH);
 
-        add(
-                mainPanel,
-                BorderLayout.NORTH
-        );
+        add(mainPanel,BorderLayout.NORTH);
 
-        add(
-                scrollPane,
-                BorderLayout.CENTER
-        );
+        add(scrollPane,BorderLayout.CENTER);
 
-        // Button action
+        // Button actions
         submitButton.addActionListener(
                 e -> submitJob()
         );
+
+        loadCsvButton.addActionListener(
+                e -> loadCsvFile()
+        );
     }
 
-    /**
-     * Sends the selected job to the
-     * distributed worker system.
-     */
+    
+    //Loads numbers from a CSV file.
+    private void loadCsvFile() {
+
+        JFileChooser fileChooser = new JFileChooser();
+
+        int result = fileChooser.showOpenDialog(this);
+
+        if (result != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File file = fileChooser.getSelectedFile();
+
+        try {
+
+            List<String> numbers = new ArrayList<>();
+
+            BufferedReader reader = new BufferedReader(
+                         new FileReader(file)
+                    );
+
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+
+                String[] values = line.split(",");
+
+                for (String value : values) {
+
+                    value = value.trim();
+
+                    if (!value.isEmpty()) {
+                        numbers.add(value);
+                    }
+                }
+            }
+
+            reader.close();
+
+            if (numbers.isEmpty()) {
+
+                JOptionPane.showMessageDialog(
+                        this,"The CSV file contains no numbers."
+                );
+
+                return;
+            }
+
+            // Put the CSV numbers into the input field.
+            inputField.setText(
+                    String.join(",", numbers)
+            );
+
+            resultArea.append(
+                    "CSV loaded: "
+                    + file.getName()
+                    + "\n"
+            );
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Could not load CSV file: "
+                    + e.getMessage()
+            );
+        }
+    }
+
+    
+     //Sends the selected job to the
+     //distributed worker system.
+    
     private void submitJob() {
 
         // Get the selected job.
-        String selectedJob =
-                (String) jobType.getSelectedItem();
+        String selectedJob = (String) jobType.getSelectedItem();
 
         // Get the input entered by the user.
-        String input =
-                inputField.getText().trim();
+        String input = inputField.getText().trim();
 
         // Check for empty input.
         if (input.isEmpty()) {
@@ -132,10 +193,10 @@ public class ClientGUI extends JFrame {
             return;
         }
 
-        /*
-         * Run the client request in a separate
-         * thread so the GUI does not freeze.
-         */
+        
+        // Run the client request in a separate
+        // thread so the GUI does not freeze.
+         
         new Thread(() -> {
 
             try {
@@ -145,9 +206,8 @@ public class ClientGUI extends JFrame {
 
                 int result;
 
-                // =========================
+                
                 // MAX
-                // =========================
                 if (selectedJob.equals("MAX")) {
 
                     int[] numbers = parseNumbers(input);
@@ -155,21 +215,18 @@ public class ClientGUI extends JFrame {
                     result = client.submitMax(numbers);
                 }
 
-                // =========================
+               
                 // PRIMESUM
-                // =========================
                 else if (
                         selectedJob.equals("PRIMESUM")
                 ) {
 
-                    /*
-                     * PRIMESUM input format:
-                     *
-                     * start,end
-                     *
-                     * Example:
-                     * 1,1000
-                     */
+                    
+                     //PRIMESUM input format:
+                     //start,end
+                     //Example:
+                     //1,1000
+                     
                     String[] values = input.split(",");
 
                     if (values.length != 2) {
@@ -179,30 +236,30 @@ public class ClientGUI extends JFrame {
                         );
                     }
 
-                    int start = Integer.parseInt(
+                    int start =
+                            Integer.parseInt(
                                     values[0].trim()
                             );
 
-                    int end = Integer.parseInt(
+                    int end =
+                            Integer.parseInt(
                                     values[1].trim()
                             );
 
-                    result = client.submitPrimeSum(
+                    result =
+                            client.submitPrimeSum(
                                     start,
                                     end
                             );
                 }
 
-                // =========================
+                
                 // PRIMECOUNT
-                // =========================
                 else {
 
                     int[] numbers = parseNumbers(input);
 
-                    result = client.submitPrimeCount(
-                                    numbers
-                            );
+                    result = client.submitPrimeCount(numbers);
                 }
 
                 /*
@@ -221,9 +278,9 @@ public class ClientGUI extends JFrame {
 
             } catch (Exception e) {
 
-                /*
-                 * Display any error in the GUI.
-                 */
+                
+                 //Display any error in the GUI.
+                 
                 SwingUtilities.invokeLater(() -> {
 
                     resultArea.append(
@@ -240,20 +297,14 @@ public class ClientGUI extends JFrame {
     /**
      * Converts comma-separated numbers into
      * an integer array.
-     *
-     * Example:
-     *
-     * 12,5,27,3,19
-     *
-     * becomes:
-     *
-     * [12, 5, 27, 3, 19]
      */
     private int[] parseNumbers(String input) {
 
-        String[] values = input.split(",");
+        String[] values =
+                input.split(",");
 
-        int[] numbers = new int[values.length];
+        int[] numbers =
+                new int[values.length];
 
         for (int i = 0;
                 i < values.length;
@@ -268,14 +319,15 @@ public class ClientGUI extends JFrame {
         return numbers;
     }
 
-    /**
-     * Main method used to start the GUI.
-     */
+    
+     //Main method used to start the GUI.
+     
     public static void main(String[] args) {
 
         SwingUtilities.invokeLater(() -> {
 
-            ClientGUI gui = new ClientGUI();
+            ClientGUI gui =
+                    new ClientGUI();
 
             gui.setVisible(true);
         });

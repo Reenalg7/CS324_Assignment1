@@ -56,9 +56,6 @@ public class Worker extends UnicastRemoteObject
     private Map<Integer, WorkerInterface> neighbours = new HashMap<>();
 
     // Stores workers participating in the election.
-    //
-    // Key   = Worker ID
-    // Value = JAC value
     private Map<Integer, Integer> electionWorkers =
             new HashMap<>();
 
@@ -112,8 +109,8 @@ public class Worker extends UnicastRemoteObject
      *
      * Only the current coordinator can assign a job.
      *
-     * @param targetWorker the worker receiving the job
-     * @param jobName name of the job being assigned
+     *  targetWorker the worker receiving the job
+     *  jobName name of the job being assigned
      */
     public void assignJob(
             WorkerInterface targetWorker,
@@ -200,8 +197,8 @@ public class Worker extends UnicastRemoteObject
 
     
      //Calculates the maximum value in an unsorted list.
-     //@param numbers list of integers
-     //@return largest value in the list
+     // numbers list of integers
+     //return largest value in the list
      
     public int calculateMax(int[] numbers) {
 
@@ -228,8 +225,8 @@ public class Worker extends UnicastRemoteObject
 
     
      //Processes a MAX job.
-    // @param numbers list of numbers
-     //@return maximum value
+    // list of numbers
+     // maximum value
      
     @Override
     public int processMaxJob(int[] numbers)
@@ -248,9 +245,9 @@ public class Worker extends UnicastRemoteObject
 
     
       //Processes a PRIMESUM job.
-     // @param start starting value
-     // @param end ending value
-     // @return sum of prime numbers in the range
+     //  start starting value
+     //  end ending value
+     // return sum of prime numbers in the range
     @Override
     public int processPrimeSumJob(
             int start,
@@ -280,8 +277,7 @@ public class Worker extends UnicastRemoteObject
 
     
      //Processes a PRIMECOUNT job.
-     // @param numbers list of numbers
-     // @return number of prime numbers
+     //return number of prime numbers
     @Override
     public int processPrimeCountJob(
             int[] numbers)
@@ -307,8 +303,8 @@ public class Worker extends UnicastRemoteObject
 
     
       //Checks whether a number is prime.   
-     //@param number number to check
-     //@return true if prime, otherwise false
+     // number number to check
+     //return true if prime, otherwise false
      
     private boolean isPrime(int number) {
 
@@ -330,8 +326,8 @@ public class Worker extends UnicastRemoteObject
 
     
      //Adds another worker as a direct neighbour.
-     // @param neighbourId ID of the neighbour worker
-     // @param neighbour remote reference to the neighbour
+     //  neighbourId ID of the neighbour worker
+     //  neighbour remote reference to the neighbour
     @Override
     public void addNeighbour(
             int neighbourId,
@@ -380,7 +376,7 @@ public class Worker extends UnicastRemoteObject
      * 1. Lowest JAC is selected.
      * 2. If JAC values are equal, highest Worker ID is selected.
      *
-     * @return Worker ID of the selected coordinator
+     * return Worker ID of the selected coordinator
      */
     public int selectCoordinator() {
 
@@ -421,7 +417,6 @@ public class Worker extends UnicastRemoteObject
 
     
       //Receives a normal message from another worker.
-     //@param message message received
      
     @Override
     public void receiveMessage(String message)
@@ -439,7 +434,7 @@ public class Worker extends UnicastRemoteObject
      *
      * Each election is processed only once.
      *
-     * @param electionId unique ID of the election
+     * electionId unique ID of the election
      */
     @Override
     public void receiveElection(
@@ -560,9 +555,9 @@ public class Worker extends UnicastRemoteObject
     /**
      * Receives election information from another worker.
      *
-     * @param electionId unique ID of the election
-     * @param candidateId ID of the worker
-     * @param candidateJac JAC value of the worker
+     *  electionId unique ID of the election
+     *  candidateId ID of the worker
+     *  candidateJac JAC value of the worker
      */
     @Override
     public synchronized void receiveElectionData(
@@ -646,10 +641,8 @@ public class Worker extends UnicastRemoteObject
 
             try {
 
-                Registry registry =
-                        LocateRegistry.getRegistry(
-                                "localhost",
-                                1099
+                Registry registry = LocateRegistry.getRegistry(
+                                "localhost",1099
                         );
 
                 BootstrapInterface bootstrap =
@@ -699,7 +692,7 @@ public class Worker extends UnicastRemoteObject
      * Finishes collecting election information
      * and selects the coordinator.
      *
-     * @param electionId election ID
+     * 
      */
     @Override
     public void finishElection(String electionId)
@@ -726,7 +719,7 @@ public class Worker extends UnicastRemoteObject
     /**
      * Receives a COORDINATOR message.
      *
-     * @param coordinatorId ID of the elected coordinator
+     * coordinatorId ID of the elected coordinator
      */
     @Override
     public void receiveCoordinator(int coordinatorId)
@@ -1155,8 +1148,6 @@ public class Worker extends UnicastRemoteObject
      * active worker obtained from the Bootstrap Node.
      *
      * The current worker is excluded from the list.
-     *
-     * @param bootstrap Bootstrap Node reference
      */
     private static void connectToRandomWorker(Worker worker,BootstrapInterface bootstrap)
             throws RemoteException {
@@ -1326,8 +1317,7 @@ public class Worker extends UnicastRemoteObject
      *
      * The coordinator divides the numbers among
      * the currently active workers.
-     *
-     * @param numbers numbers to process
+     * numbers to process
      * @return maximum value
      */
     @Override
@@ -1471,9 +1461,8 @@ public class Worker extends UnicastRemoteObject
 
     /**
      * Receives a PRIMESUM job from a client.
-     *
-     * @param start starting number
-     * @param end ending number
+     * start starting number
+     *  end ending number
      * @return total sum of prime numbers
      */
     @Override
@@ -1610,9 +1599,7 @@ public class Worker extends UnicastRemoteObject
 
     /**
      * Receives a PRIMECOUNT job from a client.
-     *
-     * @param numbers numbers to check
-     * @return number of prime numbers
+     * return number of prime numbers
      */
     @Override
     public int submitPrimeCountJob(
